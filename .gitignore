@@ -1,0 +1,10 @@
+# Ignore environment files containing passwords
+.env
+
+# Ignore actual Ansible inventory (IP addresses)
+hosts.ini
+
+# Ignore SSH keys (if you ever accidentally drop them in here)
+*.pem
+*.key
+id_rsa*
