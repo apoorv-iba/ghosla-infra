@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:11.4
+    container_name: shlink-db
+    restart: always
+    environment:
+      # In Portainer, we will set these passwords securely in the Environment Variables tab
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: shlink
+      MARIADB_USER: shlink
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - shlink_db_data:/var/lib/mysql
+    networks:
+      - shlink-internal
+
+  shlink-server:
+    image: shlinkio/shlink:stable
+    container_name: shlink-server
+    restart: always
+    depends_on:
+      - mariadb
+    environment:
+      DB_DRIVER: maria
+      DB_USER: shlink
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: shlink
+      DB_HOST: mariadb
+      # The domain you will use for your short links (e.g., go.ghosla.com)
+      DEFAULT_DOMAIN: ${SHLINK_DOMAIN} 
+      IS_HTTPS_ENABLED: false
+      GEOLITE_LICENSE_KEY: ${GEOLITE_LICENSE_KEY}
+      SHELL_VERBOSITY: 3
+    ports:
+      # Exposes the API to your Tailscale network on port 8080
+      - "10000:8080" 
+    networks:
+      - shlink-internal
+      - cf-nw
+
+  shlink-web:
+    image: shlinkio/shlink-web-client:latest
+    container_name: shlink-web
+    restart: always
+    environment:
+      SHLINK_SERVER_URL: ${SHLINK_SERVER_URL}
+      SHLINK_SERVER_NAME: ${SHLINK_SERVER_NAME}
+      SHLINK_SERVER_API_KEY: ${SHLINK_SERVER_API_KEY}
+    ports:
+      # Exposes the Web UI to your Tailscale network on port 8081
+      - "10001:80"
+    networks:
+      - shlink-internal
+      - rproxy-nw
+
+volumes:
+  shlink_db_data:
+
+networks:
+  shlink-internal:
+    name: shlink_internal
+  rproxy-nw:
+    external: true
+  cf-nw:
+    external: true

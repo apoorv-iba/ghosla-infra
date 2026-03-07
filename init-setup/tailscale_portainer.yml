@@ -1,6 +1,6 @@
 ---
 - name: Install Tailscale and Deploy Portainer
-  hosts: oracle_vm
+  hosts: all
 
   tasks:
     # ==========================================
