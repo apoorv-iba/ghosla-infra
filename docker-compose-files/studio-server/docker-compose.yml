@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  studio-server:
+    image: allebb/studio-server:latest
+    container_name: studio-server
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Kolkata
+    ports:
+      - "5432:5432"   # PostgreSQL
+      - "50059:50059" # App/Service port
+      - "8543:8543"   # Web UI / API port
+    volumes:
+      - ./hooks:/var/studio-server/hooks/
+      - ./database:/var/studio-server/database/
+      - ./backups:/var/studio-server/backups/
+      - ./jobs:/etc/cron.d/
