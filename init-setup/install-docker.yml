@@ -1,6 +1,6 @@
 ---
 - name: Setup Docker on Ubuntu (Official deb822 Method)
-  hosts: oracle_vm
+  hosts: all
   become: yes # Run tasks as root
 
   tasks:
