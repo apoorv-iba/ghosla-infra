@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: wordpress-db
+    restart: always
+    environment:
+      # Using the exact credentials from your Unraid screenshot
+      MARIADB_DATABASE: wordpress
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      MARIADB_RANDOM_ROOT_PASSWORD: '1' # Auto-generates a secure root password
+    volumes:
+      - wordpress_db_data:/var/lib/mysql
+    networks:
+      - wp-internal
+
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress-web
+    restart: always
+    depends_on:
+      - mariadb
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_USER: ${MARIADB_USER}
+      WORDPRESS_DB_PASSWORD: ${MARIADB_PASSWORD}
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress_files:/var/www/html
+    ports:
+      - "10002:80"
+    networks:
+      - wp-internal
+      - rproxy-nw
+      - cf-nw
+
+volumes:
+  wordpress_db_data:
+  wordpress_files:
+
+networks:
+  wp-internal:
+    name: wp-internal
+  rproxy-nw:
+    external: true
+  cf-nw:
+    external: true
