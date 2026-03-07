@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2
+    container_name: uptime-kuma
+    restart: always
+    volumes:
+      # This stores all your historical uptime data and settings
+      - uptime_kuma_data:/app/data
+    ports:
+      # Exposes the dashboard to your Tailscale network
+      - "10003:3001"
+    networks:
+      - internal-monitoring
+
+volumes:
+  uptime_kuma_data:
+
+networks:
+  internal-monitoring:
+    name: internal-monitoring
