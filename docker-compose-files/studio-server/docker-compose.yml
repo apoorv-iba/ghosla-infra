@@ -8,11 +8,19 @@ services:
     environment:
       - TZ=Asia/Kolkata
     ports:
-      - "5432:5432"   # PostgreSQL
-      - "50059:50059" # App/Service port
-      - "8543:8543"   # Web UI / API port
+      - "5432:5432"
+      - "50059:50059"
+      - "8543:8543"
     volumes:
-      - ./hooks:/var/studio-server/hooks/
-      - ./database:/var/studio-server/database/
-      - ./backups:/var/studio-server/backups/
-      - ./jobs:/etc/cron.d/
+      # These are now Named Volumes
+      - studio_hooks:/var/studio-server/hooks/
+      - studio_database:/var/studio-server/database/
+      - studio_backups:/var/studio-server/backups/
+      - studio_jobs:/etc/cron.d/
+
+# Now we call them out at the bottom!
+volumes:
+  studio_hooks:
+  studio_database:
+  studio_backups:
+  studio_jobs:
