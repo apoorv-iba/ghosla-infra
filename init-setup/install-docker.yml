@@ -1,6 +1,6 @@
 ---
 - name: Setup Docker on Ubuntu (Official deb822 Method)
-  hosts: all
+  hosts: oracle_vm
   become: yes # Run tasks as root
 
   tasks:
@@ -58,6 +58,6 @@
 
     - name: Add 'ubuntu' user to the 'docker' group (Rootless Docker)
       user:
-        name: ubuntu
+        name: "{{ ansible_user }}"
         groups: docker
         append: yes

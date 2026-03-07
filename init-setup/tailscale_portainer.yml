@@ -1,0 +1,51 @@
+---
+- name: Install Tailscale and Deploy Portainer
+  hosts: oracle_vm
+
+  tasks:
+    # ==========================================
+    # PART 1: ZERO TRUST NETWORKING
+    # ==========================================
+    - name: Download and run Tailscale install script
+      become: yes
+      shell: curl -fsSL https://tailscale.com/install.sh | sh
+      args:
+        creates: /usr/bin/tailscale # Makes this task idempotent
+
+    # ==========================================
+    # PART 2: DOCKER DEPLOYMENT (Runs as 'dev')
+    # ==========================================
+    - name: Create directory for Portainer
+      file:
+        path: /home/{{ ansible_user }}/portainer
+        state: directory
+        mode: '0755'
+
+    - name: Push Portainer docker-compose.yml to server
+      copy:
+        dest: /home/{{ ansible_user }}/portainer/docker-compose.yml
+        content: |
+          services:
+            portainer:
+              image: portainer/portainer-ce:latest
+              container_name: portainer
+              restart: always
+              security_opt:
+                - no-new-privileges:true
+              volumes:
+                - /var/run/docker.sock:/var/run/docker.sock:ro
+                - portainer_data:/data
+              ports:
+                - "8000:8000"
+                - "9443:9443"
+          
+          volumes:
+            portainer_data:
+        mode: '0644'
+
+    - name: Start Portainer via Docker Compose
+      command: docker compose up -d
+      args:
+        chdir: /home/{{ ansible_user }}/portainer
+      register: compose_output
+      changed_when: "'Started' in compose_output.stdout or 'Created' in compose_output.stdout"
