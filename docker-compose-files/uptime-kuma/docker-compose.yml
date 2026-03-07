@@ -13,6 +13,7 @@ services:
       - "10003:3001"
     networks:
       - internal-monitoring
+      - rproxy-nw
 
 volumes:
   uptime_kuma_data:
@@ -20,3 +21,5 @@ volumes:
 networks:
   internal-monitoring:
     name: internal-monitoring
+  rproxy-nw:
+    external: true
