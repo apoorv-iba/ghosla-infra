@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  freshrss:
+    image: freshrss/freshrss:latest
+    container_name: freshrss
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Kolkata
+      - CRON_MIN=4,34
+    ports:
+      - "10005:80"
+    volumes:
+      # Standard local named volume
+      - freshrss_data:/var/www/FreshRSS/data
+    networks:
+      - backend-nw
+      - rproxy-nw
+# Mairadb config lives in config.php
+volumes:
+  # This tells Compose the volume already exists locally
+  freshrss_data:
+    external: true
+
+networks:
+  backend-nw:
+    external: true
+  rproxy-nw:
+    external: true
