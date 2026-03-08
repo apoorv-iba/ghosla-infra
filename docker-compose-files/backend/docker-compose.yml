@@ -16,9 +16,24 @@ services:
     networks:
       - backend-nw
 
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    restart: always
+    ports:
+      - "11001:8080"
+    environment:
+      # Quality of Life: This auto-fills the "Server" box on the login screen!
+      ADMINER_DEFAULT_SERVER: mariadb-standalone
+    networks:
+      - backend-nw
+      - rproxy-nw
+
 volumes:
   mariadb_master_data:
 
 networks:
   backend-nw:
+    external: true
+  rproxy-nw:
     external: true
