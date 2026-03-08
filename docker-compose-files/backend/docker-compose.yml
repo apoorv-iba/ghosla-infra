@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mariadb-master:
+    # Using 11.4 because it is the current Long Term Support (LTS) release
+    image: mariadb:11.4
+    container_name: mariadb-master
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-default_db}
+      MARIADB_USER: ${MARIADB_USER:-default_user}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-default_password}
+    volumes:
+      - mariadb_master_data:/var/lib/mysql
+    networks:
+      - backend-nw
+
+volumes:
+  mariadb_master_data:
+
+networks:
+  backend-nw:
+    external: true
