@@ -23,6 +23,36 @@ services:
       - backend-nw
       - cf-nw
 
+  karakeep-backup:
+    image: alpine:3.22
+    container_name: karakeep-backup
+    restart: unless-stopped
+    depends_on:
+      - karakeep
+    environment:
+      BACKUP_INTERVAL: ${KARAKEEP_BACKUP_INTERVAL:-24h}
+      BACKUP_RETENTION_DAYS: ${KARAKEEP_BACKUP_RETENTION_DAYS:-30}
+      BACKUP_RUN_ON_START: ${KARAKEEP_BACKUP_RUN_ON_START:-true}
+      REMOTE_HOST: ${KARAKEEP_BACKUP_REMOTE_HOST:-100.87.198.18}
+      REMOTE_USER: ${KARAKEEP_BACKUP_REMOTE_USER:-root}
+      REMOTE_BACKUP_PATH: ${KARAKEEP_BACKUP_REMOTE_PATH:-/mnt/user/bu/docker-apps/karakeep}
+      TZ: ${TZ:-Asia/Kolkata}
+    command:
+      - /bin/sh
+      - -c
+      - apk add --no-cache openssh-client sqlite tzdata && exec /bin/sh /opt/karakeep-backup.sh
+    volumes:
+      - karakeep_data:/source:ro
+      - ./karakeep-backup.sh:/opt/karakeep-backup.sh:ro
+      - /home/dev/rocket_chat_bu/ssh/id_ed25519:/run/secrets/ssh_key:ro
+      - /home/dev/rocket_chat_bu/ssh/known_hosts:/run/secrets/known_hosts:ro
+    networks:
+      - backend-nw
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
 volumes:
   karakeep_data:
 
