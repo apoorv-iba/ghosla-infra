@@ -41,6 +41,20 @@ services:
     networks:
       - backend-nw
 
+  browserless:
+    image: ghcr.io/browserless/chromium:latest
+    container_name: browserless
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      TOKEN: ${BROWSERLESS_TOKEN}
+      CONCURRENT: "10"
+      QUEUED: "10"
+      TIMEOUT: "300000"
+    shm_size: "2g"
+    networks:
+      - backend-nw
+
 volumes:
   mariadb_master_data:
   meilisearch_data:
