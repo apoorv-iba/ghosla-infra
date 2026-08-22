@@ -40,7 +40,7 @@ services:
     command:
       - /bin/sh
       - -c
-      - apk add --no-cache openssh-client sqlite tzdata && exec /bin/sh -x /opt/karakeep-backup.sh
+      - apk add --no-cache openssh-client sqlite tzdata; echo APK_RC=$?; ls -ld /opt/karakeep-backup.sh; wc -c /opt/karakeep-backup.sh; /bin/sh -x /opt/karakeep-backup.sh 2>&1; echo SCRIPT_RC=$?; sleep 1d
     volumes:
       - karakeep_data:/source:ro
       - ./karakeep-backup.sh:/opt/karakeep-backup.sh:ro
