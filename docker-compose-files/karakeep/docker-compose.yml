@@ -40,10 +40,13 @@ services:
     command:
       - /bin/sh
       - -c
-      - apk add --no-cache openssh-client sqlite tzdata; echo APK_RC=$?; ls -ld /opt/karakeep-backup.sh; wc -c /opt/karakeep-backup.sh; /bin/sh -x /opt/karakeep-backup.sh 2>&1; echo SCRIPT_RC=$?; sleep 1d
+      - >-
+        apk add --no-cache openssh-client sqlite tzdata &&
+        wget -qO /tmp/karakeep-backup.sh
+        https://raw.githubusercontent.com/apoorv-iba/ghosla-infra/af7e0f88b5c55a0697df2b6518f407af2123cb05/docker-compose-files/karakeep/karakeep-backup.sh &&
+        exec /bin/sh /tmp/karakeep-backup.sh
     volumes:
       - karakeep_data:/source:ro
-      - ./karakeep-backup.sh:/opt/karakeep-backup.sh:ro
       - /home/dev/rocket_chat_bu/ssh/id_ed25519:/run/secrets/ssh_key:ro
       - /home/dev/rocket_chat_bu/ssh/known_hosts:/run/secrets/known_hosts:ro
     networks:
