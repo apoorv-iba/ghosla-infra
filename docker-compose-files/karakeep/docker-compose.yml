@@ -36,18 +36,21 @@ services:
       REMOTE_HOST: ${KARAKEEP_BACKUP_REMOTE_HOST:-100.87.198.18}
       REMOTE_USER: ${KARAKEEP_BACKUP_REMOTE_USER:-root}
       REMOTE_BACKUP_PATH: ${KARAKEEP_BACKUP_REMOTE_PATH:-/mnt/user/bu/docker-apps/karakeep}
+      KARAKEEP_BACKUP_SSH_PRIVATE_KEY_B64: ${KARAKEEP_BACKUP_SSH_PRIVATE_KEY_B64}
       TZ: ${TZ:-Asia/Kolkata}
     command:
       - /bin/sh
       - -c
       - >-
         apk add --no-cache openssh-client sqlite tzdata &&
+        mkdir -p /run/secrets &&
+        printf '%s' "$$KARAKEEP_BACKUP_SSH_PRIVATE_KEY_B64" | base64 -d > /run/secrets/ssh_key &&
+        chmod 600 /run/secrets/ssh_key &&
         wget -qO /tmp/karakeep-backup.sh
         https://raw.githubusercontent.com/apoorv-iba/ghosla-infra/af7e0f88b5c55a0697df2b6518f407af2123cb05/docker-compose-files/karakeep/karakeep-backup.sh &&
         exec /bin/sh /tmp/karakeep-backup.sh
     volumes:
       - karakeep_data:/source:ro
-      - /home/dev/rocket_chat_bu/ssh/id_ed25519:/run/secrets/ssh_key:ro
       - /home/dev/rocket_chat_bu/ssh/known_hosts:/run/secrets/known_hosts:ro
     networks:
       - backend-nw
@@ -55,8 +58,6 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add:
-      - DAC_OVERRIDE
 
 volumes:
   karakeep_data:
