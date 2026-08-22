@@ -29,8 +29,21 @@ services:
       - backend-nw
       - rproxy-nw
 
+  meilisearch:
+    image: getmeili/meilisearch:v1.41.0
+    container_name: meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY}
+    volumes:
+      - meilisearch_data:/meili_data
+    networks:
+      - backend-nw
+
 volumes:
   mariadb_master_data:
+  meilisearch_data:
 
 networks:
   backend-nw:
